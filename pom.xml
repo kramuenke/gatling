@@ -11,6 +11,7 @@
 		<module>gatling-core</module>
 		<module>gatling-jdbc</module>
 		<module>gatling-http</module>
+		<module>gatling-epp</module>
 		<module>gatling-app</module>
 		<module>gatling-recorder</module>
 		<module>gatling-charts</module>
