@@ -20,7 +20,7 @@ import com.excilys.ebi.gatling.core.session.Session
 import com.excilys.ebi.gatling.core.result.writer.DataWriter
 import com.excilys.ebi.gatling.core.result.message.RequestStatus
 
-import com.thoughtworks.gatling.epp.EppConnectBuilder
+import com.thoughtworks.gatling.epp.EppSendBuilder
 
 import java.lang.System._
 import java.lang.Thread._
@@ -33,28 +33,19 @@ import java.net.InetSocketAddress
 import akka.actor.ActorRef
 import grizzled.slf4j.Logging
 
-class EppConnectAction(requestName: String, next: ActorRef, requestBuilder: EppConnectBuilder) extends Action with Logging {
+class EppSendAction(requestName: String, next: ActorRef, requestBuilder: EppSendBuilder) extends Action with Logging {
   def execute(session: Session) {
     
     val requestStartDate = currentTimeMillis()
     
-    val channel = SocketChannel.open()
-    channel.connect(new InetSocketAddress("10.6.15.36", 7000))
+    val channel = session.getTypedAttribute[SocketChannel]("channel")
+   
+    channel.write(ByteBuffer.wrap("hello".getBytes))
+    var response = ByteBuffer.allocate(1024)
+    channel.read(response)
+    System.out.println(new String(response.array))
+    channel.close
     
-    val greeting = ByteBuffer.allocate(2048)
-    channel.read(greeting)
-    System.out.println(new String(greeting.array))
-    
-    val session2 = session.setAttribute("channel", channel)
-    
-    
-    
-    // channel.write(ByteBuffer.wrap("hello".getBytes))
-    // var response = ByteBuffer.allocate(1024)
-    // channel.read(response)
-    // System.out.println(new String(response.array))
-    // channel.close
-    // 
     val responseEndDate = currentTimeMillis()
     val endOfRequestSendingDate = currentTimeMillis()
     val endResponseSendingDate = endOfRequestSendingDate
@@ -69,6 +60,6 @@ class EppConnectAction(requestName: String, next: ActorRef, requestBuilder: EppC
 
     // This is also an important line. This passes the focus onto the next action in the chain.
     // Without this line your pipeline will just hang indefinitely.
-    next ! session2
+    next ! session
   }
 }

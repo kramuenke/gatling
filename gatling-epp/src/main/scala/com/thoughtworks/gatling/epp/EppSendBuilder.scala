@@ -15,11 +15,12 @@
  */
 package com.thoughtworks.gatling.epp
 
-object EppBuilder {
-  def epp(requestName: String) = new EppBuilder(requestName)
+import com.thoughtworks.gatling.epp.action.EppSendActionBuilder
+
+class EppSendBuilder(requestName: String, message: String) {
+  def toActionBuilder = new EppSendActionBuilder(requestName, this, null)
 }
 
-class EppBuilder(val requestName: String) {
-  def connect(host:String, port:Int) = new EppConnectBuilder(requestName, host, port)
-  def send(message:String) = new EppSendBuilder(requestName, message)
+object EppSendBuilder {
+  implicit def toActionBuilder(requestBuilder: EppSendBuilder) = requestBuilder.toActionBuilder
 }
